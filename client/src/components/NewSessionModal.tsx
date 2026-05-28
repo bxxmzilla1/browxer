@@ -25,8 +25,12 @@ export function NewSessionModal({ onClose }: Props) {
         body: JSON.stringify({ label: label.trim(), proxyId: proxyId || undefined }),
       });
       if (!res.ok) {
-        const j = await res.json() as { error?: string };
-        throw new Error(j.error ?? 'Spawn failed');
+        let message = `Spawn failed (${res.status})`;
+        try {
+          const j = await res.json() as { error?: string };
+          if (j.error) message = j.error;
+        } catch { /* non-JSON body */ }
+        throw new Error(message);
       }
       onClose();
     } catch (e) {

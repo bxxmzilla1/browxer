@@ -9,6 +9,39 @@ import type { Request, Response } from 'express';
 
 const router = Router();
 
+// ── Runtime config (Browserless credentials) ──────────────────────────────────
+
+router.get('/config', (_req: Request, res: Response) => {
+  // Never return the token – only return whether it's set and the (masked) URL
+  const wsUrl = process.env.BROWSERLESS_WS_URL ?? '';
+  let maskedUrl = wsUrl;
+  try {
+    const u = new URL(wsUrl);
+    if (u.searchParams.has('token')) {
+      u.searchParams.set('token', '••••');
+      maskedUrl = u.toString();
+    }
+  } catch { /* not a valid URL yet */ }
+
+  res.json({
+    wsUrl: maskedUrl,
+    hasToken: !!process.env.BROWSERLESS_TOKEN,
+  });
+});
+
+router.post('/config', (req: Request, res: Response) => {
+  const { wsUrl, token } = req.body as { wsUrl?: string; token?: string };
+
+  if (wsUrl !== undefined) {
+    process.env.BROWSERLESS_WS_URL = wsUrl.trim();
+  }
+  if (token !== undefined) {
+    process.env.BROWSERLESS_TOKEN = token.trim();
+  }
+
+  res.json({ ok: true });
+});
+
 // ── Sessions ──────────────────────────────────────────────────────────────────
 
 router.get('/sessions', (_req: Request, res: Response) => {

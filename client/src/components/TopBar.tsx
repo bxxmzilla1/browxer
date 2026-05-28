@@ -2,11 +2,13 @@ import { useState } from 'react';
 import { ConnectionStatus } from './ConnectionStatus';
 import { NewSessionModal } from './NewSessionModal';
 import { ProxyModal } from './ProxyModal';
+import { SettingsModal } from './SettingsModal';
 import { useSessionStore } from '../store/sessionStore';
 
 export function TopBar() {
   const [showNew, setShowNew] = useState(false);
   const [showProxy, setShowProxy] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
   const sessionCount = useSessionStore((s) => Object.keys(s.sessions).length);
   const errors = useSessionStore((s) => s.errors);
   const clearErrors = useSessionStore((s) => s.clearErrors);
@@ -32,6 +34,13 @@ export function TopBar() {
         <div className="flex items-center gap-3">
           <ConnectionStatus />
           <button
+            onClick={() => setShowSettings(true)}
+            className="text-xs text-gray-400 hover:text-white transition px-2 py-1 rounded hover:bg-surface-hover"
+            title="Browserless connection settings"
+          >
+            ⚙ Settings
+          </button>
+          <button
             onClick={() => setShowProxy(true)}
             className="text-xs text-gray-400 hover:text-white transition px-2 py-1 rounded hover:bg-surface-hover"
           >
@@ -47,6 +56,7 @@ export function TopBar() {
         </div>
       </header>
 
+      {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}
       {showNew && <NewSessionModal onClose={() => setShowNew(false)} />}
       {showProxy && <ProxyModal onClose={() => setShowProxy(false)} />}
     </>
