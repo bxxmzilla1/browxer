@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: browserless-grid-server
+    runtime: node
+    buildCommand: cd server && npm install && npm run build
+    startCommand: node server/dist/index.js
+    healthCheckPath: /health
+    envVars:
+      - key: PORT
+        value: 4000
+      - key: BROWSERLESS_WS_URL
+        sync: false
+      - key: BROWSERLESS_TOKEN
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_KEY
+        sync: false
+      - key: IDLE_TIMEOUT_MS
+        value: 1800000
+      - key: PERSIST_INTERVAL_MS
+        value: 30000

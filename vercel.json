@@ -11,5 +11,9 @@
         { "key": "Service-Worker-Allowed", "value": "/" }
       ]
     }
-  ]
+  ],
+  "env": {
+    "VITE_API_URL": "https://REPLACE_WITH_YOUR_BACKEND_URL",
+    "VITE_WS_URL":  "wss://REPLACE_WITH_YOUR_BACKEND_URL/ws"
+  }
 }

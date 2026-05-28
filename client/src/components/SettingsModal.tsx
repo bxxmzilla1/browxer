@@ -39,12 +39,27 @@ export function SettingsModal({ onClose }: Props) {
       // Only send token if the user typed something new
       if (token.trim()) body.token = token.trim();
 
-      const res = await fetch(`${API_URL}/config`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      });
-      if (!res.ok) throw new Error(`Server responded ${res.status}`);
+      let res: Response;
+      try {
+        res = await fetch(`${API_URL}/config`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+      } catch {
+        throw new Error(
+          'Could not reach the backend. Make sure VITE_API_URL points to your deployed server.'
+        );
+      }
+      if (!res.ok) {
+        if (res.status === 405) {
+          throw new Error(
+            `Backend returned 405 – VITE_API_URL is probably pointing at Vercel (static host) instead of your Node server. ` +
+            `Set VITE_API_URL=https://your-backend.railway.app in Vercel env vars and redeploy.`
+          );
+        }
+        throw new Error(`Server responded ${res.status}`);
+      }
       setSaved(true);
       setToken(''); // clear plaintext field after saving
       setHasToken(true);
